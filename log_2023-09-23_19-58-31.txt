@@ -1,0 +1,6 @@
+Site: 127.0.0.11
+O site 127.0.0.11 está disponível.
+
+Site: 128.0.0.1
+O site 128.0.0.1 não está disponível.
+

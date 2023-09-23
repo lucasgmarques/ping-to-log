@@ -1,57 +1,68 @@
 import os
 import datetime
 
-def executa_ping(domain, counts=1, timeout=None):
-    print(f"Testando {domain} ...")
-    
-    response = os.popen(f"ping -c {counts} {domain} -W {timeout}").read()
-    
-    if f"{counts} received" in response:
-        print(f"{domain} - UP")
-    else:
-        print(f"{domain} - DOWN")
+# Constante para o formato da data
+FORMATO_DATA = "%Y-%m-%d_%H-%M-%S"
 
-    data_formatada = datetime.datetime.now().strftime("%d/%m/%Y-%H:%M")
+def formata_log():
+    """
+    Retorna o nome do arquivo de log formatado com a data atual.
+    """
+    current_date = datetime.datetime.now()
+    formatted_date = current_date.strftime(FORMATO_DATA)
+    log_name = f"log_{formatted_date}.txt"
+    return log_name
 
-    with open("log.txt", "a+") as file:
-         file.write(f"{domain:<20}    {data_formatada:>20}\n")
+def verifica_disponibilidade_site(site, count=2):
+    """
+    Verifica a disponibilidade de um site usando o comando 'ping' via os.system().
+    Retorna o result.
+    """
+    try:
+        # Executa o comando ping via os.system()
+        execute_ping = f"ping -c {count} {site}"
+        result = os.system(execute_ping)
 
-def le_log():
-    # Ler a saída do arquivo
-    with open("log.txt", "r") as file:
-        log_file = file.read()
+        # Verifica o código de retorno para determinar o result
+        if result == 0:
+            return f"O site {site} está disponível."
+        else:
+            return f"O site {site} não está disponível."
 
-    return log_file
-    
+    except Exception as e:
+        return f"Erro ao verificar {site}: {str(e)}"
+
+def cria_log(log_file, content):
+    """
+    Cria um arquivo de log com o conteúdo fornecido.
+    """
+    try:
+        print(f"Salvando em {log_file}...")
+        with open(log_file, "w") as file:
+            file.write(content)
+    except Exception as e:
+        print(f"Erro ao escrever o arquivo de log: {e}")
+
 def main():
-  while True:
-    print("Testa conexão:")
-    print("1 - Ping")
-    print("2 - Exibir último log")
-    print("0 - Sair")
+    # Solicita ao usuário que insira os sites separados por espaços
+    sites = input("Digite os sites que deseja verificar (separados por vírgula): ").split(",")
 
-    option = int(input("Digite uma opção: "))
+    results = {}
 
-    if option == 0:
-        print("Saindo ...")
-        break
-      
-    elif option == 1:
-        domains = input("Digite o domínio (ou separe por vírgula se mais de um): ").split(",")
+    for site in sites:
+        result = verifica_disponibilidade_site(site.strip())
+        results[site] = result
 
-        for domain in domains:
-            domain = domain.strip()    
-            executa_ping(domain, timeout=2)
-    
-    elif option == 2:
-        log = le_log()
-        print("Exibindo log ...")
-        print("----- PINGS REALIZADOS -----")
-        print(log)
-    
-    else:
-        print("Opção inválida. Tente novamente.")
-  
-# Executa o programa
+    log_file = formata_log()
+
+    # Cria o conteúdo do arquivo de log com os results
+    content = ""
+    for site, result in results.items():
+        content += f"Site: {site}\n{result}\n\n"
+
+    cria_log(log_file, content)
+    print(f"Verificação de disponibilidade concluída. results no arquivo '{log_file}'.")
+
 if __name__ == '__main__':
-  main()
+    main()
+
