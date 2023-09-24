@@ -16,7 +16,7 @@ def formata_log():
 def verifica_disponibilidade_site(site, count=2):
     """
     Verifica a disponibilidade de um site usando o comando 'ping' via os.system().
-    Retorna o result.
+    Retorna o resultado.
     """
     try:
         # Executa o comando ping via os.system()
@@ -26,8 +26,8 @@ def verifica_disponibilidade_site(site, count=2):
         # Verifica o código de retorno para determinar o result
         if result == 0:
             return f"O site {site} está disponível."
-        else:
-            return f"O site {site} não está disponível."
+        
+        return f"O site {site} não está disponível."
 
     except Exception as e:
         return f"Erro ao verificar {site}: {str(e)}"
@@ -65,4 +65,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
