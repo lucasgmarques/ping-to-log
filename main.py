@@ -1,12 +1,13 @@
 import os
 import datetime
+from prettytable import PrettyTable
 
-# Constante para o formato da data
-FORMATO_DATA = "%Y-%m-%d_%H-%M-%S"
+# formato da data
+FORMATO_DATA = "%y-%m-%d_%h-%m-%s"
 
 def formata_log():
     """
-    Retorna o nome do arquivo de log formatado com a data atual.
+    retorna o nome do arquivo de log formatado com a data atual.
     """
     current_date = datetime.datetime.now()
     formatted_date = current_date.strftime(FORMATO_DATA)
@@ -15,53 +16,58 @@ def formata_log():
 
 def verifica_disponibilidade_site(site, count=2):
     """
-    Verifica a disponibilidade de um site usando o comando 'ping' via os.system().
-    Retorna o resultado.
+    verifica a disponibilidade de um site usando o comando 'ping' via os.system().
+    retorna o outputado.
     """
     try:
-        # Executa o comando ping via os.system()
+        # executa o comando ping
         execute_ping = f"ping -c {count} {site}"
-        result = os.system(execute_ping)
+        output = os.system(execute_ping)
 
-        # Verifica o código de retorno para determinar o result
-        if result == 0:
+        # verifica o código de retorno
+        if output == 0:
             return f"O site {site} está disponível."
-        
         return f"O site {site} não está disponível."
 
-    except Exception as e:
-        return f"Erro ao verificar {site}: {str(e)}"
+    except exception as e:
+        return f"erro ao verificar {site}: {str(e)}"
 
-def cria_log(log_file, content):
+def cria_log(log_file, output):
     """
-    Cria um arquivo de log com o conteúdo fornecido.
+    cria um arquivo de log com o conteúdo fornecido.
     """
     try:
         print(f"Salvando em {log_file}...")
         with open(log_file, "w") as file:
-            file.write(content)
-    except Exception as e:
-        print(f"Erro ao escrever o arquivo de log: {e}")
+            table = PrettyTable()
+            table.field_names = ['data', 'horário', 'url', 'ip', 'status']
+            print(table)
+            file.write(output)
+    except exception as e:
+        print(f"erro ao escrever o arquivo de log: {e}")
 
 def main():
-    # Solicita ao usuário que insira os sites separados por espaços
+    """
+    função principal que solicita ao usuário uma lista de sites
+    """
+    # solicita ao usuário que insira os sites separados por espaços
     sites = input("Digite os sites que deseja verificar (separados por vírgula): ").split(",")
 
-    results = {}
+    outputs = {}
 
     for site in sites:
-        result = verifica_disponibilidade_site(site.strip())
-        results[site] = result
+        output = verifica_disponibilidade_site(site.strip())
+        outputs[site] = output
 
     log_file = formata_log()
 
-    # Cria o conteúdo do arquivo de log com os results
-    content = ""
-    for site, result in results.items():
-        content += f"Site: {site}\n{result}\n\n"
+    # cria o conteúdo do arquivo de log com os outputs
+    output = ""
+    for site, output in outputs.items():
+        output += f"site: {site}\n{output}\n\n"
 
-    cria_log(log_file, content)
-    print(f"Verificação de disponibilidade concluída. results no arquivo '{log_file}'.")
+    cria_log(log_file, output)
+    print(f"Verificação de disponibilidade concluída. outputado no arquivo '{log_file}'.")
 
 if __name__ == '__main__':
     main()
